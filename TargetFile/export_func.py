@@ -5,14 +5,14 @@ dict_phone = {}
 
 # Заповнюємо словник існуючими контактами
 def fill_dict_phone():
-    file_book = open('phonebook.msf')
-    line_count = sum(1 for line in open('phonebook.msf'))
+    with open('phonebook.msf') as file_book:
+        line_count = sum(1 for line in open('phonebook.msf'))
 
-    if line_count > 0:
-        for i in file_book:
-            key, value = i.split(' , ')
-            dict_phone[key] = value[:-1]
-    file_book.close()
+        if line_count > 0:
+            for i in file_book:
+                key, value = i.split(' , ')
+                dict_phone[key] = value[:-1]
+    
 
 
 #Перевірка номера на коректність

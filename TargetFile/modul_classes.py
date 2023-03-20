@@ -80,11 +80,11 @@ class Phone(Fields):
 
 
 
-class PhoneBook(UserDict, Phone, Name):
+class AdressBook(UserDict, Phone, Name):
     phonebook = UserDict()    
 
 
-class Record(PhoneBook):
+class Record(AdressBook):
 
     def change_name(self, name_contact):
         res_search = {}
@@ -113,7 +113,7 @@ class Record(PhoneBook):
     @classmethod
     def print_all (cls):
         cls.fill_phonebook() 
-        for i, y in PhoneBook.phonebook.data.items():
+        for i, y in AdressBook.phonebook.data.items():
             for a, b in y.items():
                 print(i + ' : ' + (',').join(b))
 

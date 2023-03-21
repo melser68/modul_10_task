@@ -39,30 +39,50 @@ class Name(Fields):
     @contact_name.deleter
     def contact_name(self):
         self.f_name.remove(self.name)
-        del self.name        
+        try:
+            del self.phonebook[self.name]
+        except KeyError:
+            pass
+        del self.data[self.name]
+        del self.name
+        del self.__dict__['phone']
+        Record.save_record(self)       
         
 
 
 class Phone(Fields):  
+
+    def check_num_in_book(self, func):
+        def wrapper(*args, **kwargs):
+            for i in args:
+                if i in self.phone:
+                    print('This number already exists')
+                else:
+                    return func(*args, **kwargs)
+        return wrapper
     
 
     @property
     def number(self):
         return (', ').join(self.phone)
 
-    @number.setter
+    
+    @number.setter    
     def number(self, number):
-
-        if len(number) == 13 and number[0] == '+':
+              
+        if len(number) == 13 and number[0] == '+' or len(number) == 0:
+            if len(number) == 0:
+                number = 'no phone'
             try:
                 self.phone.append(number)                
             except AttributeError:
                 self.phone = [number]
-            self.f_phone.append(number)                
+            if number != 'no phone':
+                self.f_phone.append(number)                               
             if self.data.get(self.name) == None:
                 self.data.update({self.name: {'phone':self.phone}})
-            Record.add_record(self)
-            
+            Record.save_record(self)
+                
             return True               
         else:
             print('The entered number does not match the pattern')
@@ -74,7 +94,7 @@ class Phone(Fields):
         self.phone.remove(number)
         if len(self.phone)  == 0:
             self.phonebook.update({self.name: {'phone':'no number phone'}})
-        Record.add_record(self)
+        Record.save_record(self)
     
 
 
@@ -94,14 +114,15 @@ class Record(AdressBook):
 
         return res_search
 
-    def add_record(self):    
+    def save_record(self):    
         with open('save_book.msf', 'w') as fh:
             for i, y in self.data.items():
                 for a, b in y.items():
                     fh.write(i + ' : ' + (',').join(b) + '\n')
     @classmethod
     def fill_phonebook(cls):
-        if len(cls.phonebook) == 0:
+        
+        try:
             with open('save_book.msf') as fh:
                 while True:
                     a = fh.readline()
@@ -109,18 +130,28 @@ class Record(AdressBook):
                         break
                     else:
                         cls.phonebook.update(
-                        {a[:-1].split(' : ')[0]: {'phone': a[:-1].split(' : ')[1].split(',')}})
+                            {a[:-1].split(' : ')[0]: {'phone': a[:-1].split(' : ')[1].split(',')}})
+        except FileNotFoundError:
+            with open('save_book.msf', 'w') as fh:
+                pass
+
+
     @classmethod
     def print_all (cls):
         cls.fill_phonebook() 
-        for i, y in AdressBook.phonebook.data.items():
-            for a, b in y.items():
-                print(i + ' : ' + (',').join(b))
+        if len(cls.phonebook) == 0:
+            print('No records')
+        else:
+            for i, y in cls.phonebook.data.items():
+                for a, b in y.items():
+                    print(i + ' : ' + (', ').join(b))
 
 
 
-
-
+contact = AdressBook()
+contact.contact_name = 'Serhii Melnyk'
+contact.number ='+380672972960'
+contact.number = '+380672972960'
 
 
 Record.print_all()

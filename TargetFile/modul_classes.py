@@ -52,13 +52,14 @@ class Name(Fields):
 
 class Phone(Fields):  
 
-    def check_num_in_book(self, func):
+    
+    def check_num_in_book(func):
         def wrapper(*args, **kwargs):
             for i in args:
-                if i in self.phone:
+                if i in self.f_phone:
                     print('This number already exists')
                 else:
-                    return func(*args, **kwargs)
+                    return func(args)
         return wrapper
     
 
@@ -67,7 +68,8 @@ class Phone(Fields):
         return (', ').join(self.phone)
 
     
-    @number.setter    
+    @number.setter
+    @check_num_in_book    
     def number(self, number):
               
         if len(number) == 13 and number[0] == '+' or len(number) == 0:

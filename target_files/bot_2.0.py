@@ -1,7 +1,7 @@
 import export_func as basic
 import modul_classes_2 as class_exp
 import time
-from pprint import pprint
+
 
 book = class_exp.Record()
 
@@ -10,7 +10,7 @@ def main_menu():
     basic.os.system('CLS')
     print('==== main menu ====')
     print('How can I help you?')
-    print('1. - Phonebook\n2. - Calendar\n3. - Exit\nYour chois:')
+    print('1. - Phonebook\n2. - Calendar jubilars\n3. - Exit\nYour chois:')
 
     chois = input('>>>>  ')
     if chois == '1':
@@ -93,8 +93,8 @@ def phone_menu():
             result = book.search_kontakts(name_contact)
             if len(result) == 0:
                 print(f'Name "{name_contact}" not found. Re-enter? ( yes / no)')
-                chois = input ('>>>>  ')
-                if chois.lower() == 'no':
+                chois_1 = input ('>>>>  ')
+                if chois_1.lower() == 'no':
                     status =False
                     phone_menu()
                 
@@ -254,16 +254,17 @@ def phone_menu():
         
 
 def calendar_menu():
-    basic.operation_calendar()
-    print('Return in main menu ?(yes/no)')
-    if input('>>>>  ').lower() == 'yes':
-            main_menu()
+    book.get_jubilars()
+    print('Return in main menu (yes/no)')
+    chois_2 = input('>>>>  ')
+    if chois_2.lower() == 'yes':
+        main_menu()
     else:
-        calendar_menu()
+        basic.input_output('goodbye')
 
 
 def __main__():
-    basic.os.system('CLS')
+    class_exp.os.system('CLS')
     print('Hello! I am a bot.\nEnter "hello" to get started or any other word to exit.')
     chois = input('>>>>  ').lower()
     chois = basic.input_output(chois)

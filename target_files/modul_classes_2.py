@@ -1,8 +1,8 @@
 from collections import UserDict
 from string import ascii_letters
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 import os
-
+import func_birthday as fb
 
 
 
@@ -79,9 +79,6 @@ class Phone(Fields):
 
     def phone_del(self, number):
         self.__phone.pop(self.__phone.index(number))
-            
-        
-            
 
 
 class Email(Fields):
@@ -115,7 +112,6 @@ class Email(Fields):
 
     def email_del(self, email):
         self.__email.pop(self.__email.index(email))
-            
 
 
 class DateBirth(Fields):
@@ -175,7 +171,7 @@ class Record:
 
             if line_count > 0:
                 for i in file_book:
-                    res = i.replace('\n', '').replace(':',';').split(';')
+                    res = i.replace('\n', '').replace(':', ';').split(';')
                     self.name = Name()
                     self.name.name = res[0]
                     self.phone = Phone()
@@ -237,14 +233,14 @@ class Record:
                 self.book.pop(name_search)
                 break
         with open('phonebook.msf', 'w') as fh:
-            for i , y in self.book.items():
+            for i, y in self.book.items():
                 rec = []
                 for a in y:
                     if type(list(a.values())[0]) != str:
                         rec.append(','.join(list(a.values())[0]))
                     else:
                         rec.append(list(a.values())[0])
-                        fh.write(i + ':' + ';'.join(rec))                                    
+                        fh.write(i + ':' + ';'.join(rec))
                         fh.write('\n')
 
     # Пошук існуючого контакту, або контактів у довіднику
@@ -254,12 +250,12 @@ class Record:
         for kontakt, num_tel in self.book.items():
             if name_contact in kontakt.lower():
                 res_search.update({kontakt: num_tel})
-            
+
         return res_search
 
-    #Зміна реквізиту контакта
+    # Зміна реквізиту контакта
     def change_record(self, name_search, new_value, name_value):
-        
+
         for name_book, value_book in self.book.items():
 
             if name_search == name_book:
@@ -267,28 +263,31 @@ class Record:
                 new_phone = Phone()
                 for t in list(value_book[0].values())[0]:
                     if t != 'No phone':
-                        new_phone.phone = t 
+                        new_phone.phone = t
                 if name_value == 'phone':
-                    new_phone.phone = new_value                                              
-                                    
+                    if Phone.verify_phone(new_value):
+                        new_phone.phone = new_value
+
                 new_mail = Email()
-                for i in list(value_book[1].values())[0]:                        
-                    if i != 'No email':                            
+                for i in list(value_book[1].values())[0]:
+                    if i != 'No email':
                         new_mail.email = i
                 if name_value == 'email':
-                        new_mail.email = new_value 
+                    if Email.veryfi_email(new_value):
+                        new_mail.email = new_value
 
                 if name_value == 'date_birth':
-                    self.date_birth.date_birth = new_value                        
-                        
+                    if DateBirth.veryfi_date(new_value):
+                        self.date_birth.date_birth = new_value
+
                 record = [{'phone': new_phone.phone}, {'email': new_mail.email},
-                        {'date birth': self.date_birth.date_birth}]
+                          {'date birth': self.date_birth.date_birth}]
                 self.book.update({name_search: record})
                 os.system('CLS')
 
                 with open('phonebook.msf', 'w') as fh:
-                        
-                    for i , y in self.book.items():
+
+                    for i, y in self.book.items():
                         rec = []
                         for a in y:
                             if type(list(a.values())[0]) != str:
@@ -296,7 +295,71 @@ class Record:
                             else:
                                 rec.append(list(a.values())[0])
 
-                        fh.write(i + ' : ' + ';'.join(rec))                                    
+                        fh.write(i + ' : ' + ';'.join(rec))
                         fh.write('\n')
-        return True    
-    
+        return True
+
+    # Збираємо список юбілярів
+
+    def anniversaries_in_the_week(self, now_day, date_end):
+        dict_birth_in_week = {}
+
+        for name, record in self.book.items():
+            for dct in record:
+                for key, value in dct.items():
+                    if key == 'date_birth':
+                        date_b = value
+
+            date_b = value.split(
+                '-')[0] + '-' + value.split('-')[1] + '-' + now_day.strftime('%Y')
+            date_b = datetime.strptime(date_b, '%d-%m-%Y')
+
+            if datetime.isoweekday(date_b) == 6:
+                date_b += timedelta(2)
+            elif datetime.isoweekday(date_b) == 7:
+                date_b += timedelta(1)
+
+            day_in_week = date_b.strftime('%A')
+
+            if now_day <= date_b <= date_end:
+
+                rez = dict_birth_in_week.get(day_in_week)
+                if rez == None:
+                    dict_birth_in_week.update({day_in_week: [name]})
+                else:
+                    rez.append(name)
+                    dict_birth_in_week.update({day_in_week: rez})
+
+        return dict_birth_in_week
+
+    # Отримуємо поточну дату
+    @staticmethod
+    def now_days():
+        now_date = datetime.now()
+        return now_date
+
+    # Отримуємо кінцеву дату аналізу
+    @staticmethod
+    def delta_dates(now_day):
+        delta_dates = timedelta(7)
+        date_end = now_day + delta_dates
+        return date_end
+
+
+    @staticmethod
+    def print_result(res_jubilars):
+        for key, value in res_jubilars.items():
+            a = (',  ').join(value)
+            print(key, ' : ', a)
+
+
+    #основна функція друку списку юбілярів
+    def get_jubilars(self):
+
+        now_day = self.now_days()
+
+        date_end = self.delta_dates(now_day)
+
+        res_jubilars = self.anniversaries_in_the_week(now_day, date_end)
+
+        self.print_result(res_jubilars)

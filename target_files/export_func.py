@@ -69,13 +69,4 @@ def input_output(text_user):
         return True
     else:        
         print('=== GoobBye ! ===')
-
-
-
-def operation_calendar():
-    os.system('CLS')
-    print('==== calendar ====')
-    calendar.TextCalendar().pryear(2023)
-
-
-
+        return False

@@ -254,7 +254,9 @@ def phone_menu():
         
 
 def calendar_menu():
+    class_exp.os.system('CLS')
     book.get_jubilars()
+    print('='*30)
     print('Return in main menu (yes/no)')
     chois_2 = input('>>>>  ')
     if chois_2.lower() == 'yes':

@@ -2,7 +2,8 @@ from collections import UserDict
 from string import ascii_letters
 from datetime import datetime, timedelta
 import os
-import func_birthday as fb
+import locale
+locale.setlocale(locale.LC_ALL, "")
 
 
 

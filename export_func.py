@@ -54,11 +54,12 @@ def check_birthdate (birthdate):
         print('Invalid date entered (sample - "dd-mm-yyyy")')
         date_birth = input('Re-enter >>>>  ')
         class_exp.DateBirth.veryfi_date(date_birth)
-    else:
-        return (True, birthdate)
-    if birthdate == '':
-        date_birth = 'No date'
-        return (True, date_birth)
+    else:        
+        if birthdate == '':
+            date_birth = 'No date'
+            return (True, date_birth)
+        else:
+            return (True, birthdate)
 
 
 
